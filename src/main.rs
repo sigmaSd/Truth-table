@@ -2,6 +2,7 @@ use gtk::{Window, Entry, Label, Grid, WindowType, ContainerExt, WidgetExt, Label
 use permutator::CartesianProduct;
 use eval::{eval, Value};
 
+// useful trait
 trait AddIfNotExists<T>{
     fn add_if_not_exists(&mut self, _e: T) {}
 }
@@ -83,6 +84,7 @@ impl SecondPage {
     fn create_grid() -> Grid {
         let grid = Grid::new();
         grid.set_column_spacing(10);
+        grid.set_margin_start(20);
         grid
     }
 }
@@ -105,11 +107,11 @@ impl Pages {
            let entry_text = entry.get_text().expect("Error while reading entry formula");
            let (var_labels, var_values) = parse(&entry_text);
            let grid = second_page_grid.clone();
-           Self::fill_grid(grid, var_labels, var_values);
+           Self::fill_grid(&grid, &var_labels, &var_values);
 
         });
     }
-    fn fill_grid(grid: Grid, labels: Vec<char>, values: Vec<(Vec<&'static str>, Value)>) {
+    fn fill_grid(grid: &Grid, labels: &[char], values: &[(Vec<&'static str>, Value)]) {
         let last_col = labels.len() as i32;
         for (idx,label) in labels.iter().enumerate() {
             let label_text = label.to_string();
@@ -121,9 +123,9 @@ impl Pages {
         for (row, (inputs, output)) in values.iter().rev().enumerate() {
             let row = (row + 1) as i32;
             let inputs: Vec<&str> = inputs.iter().map(|v|{
-                match v {
-                    &"true" => "1",
-                    &"false" => "0",
+                match *v {
+                    "true" => "1",
+                    "false" => "0",
                     _ => unreachable!(),
                 }
             }).collect();
@@ -150,31 +152,21 @@ fn parse(text: &str) -> (Vec<char>, Vec<(Vec<&'static str>, Value)>){
         let text = text.to_lowercase().replace(" ", "");
         // en
         let text = text.replace("and", "&&").replace("or", "||").replace("not", "!");
-        // fr
-        let text = text.replace("et", "&&").replace("ou", "||").replace("non", "!");
-        
-        text
+        // also fr cause why not
+        text.replace("et", "&&").replace("ou", "||").replace("non", "!")        
         };
     let mut vars = Vec::new();
     let mut results = Vec::new();
 
-    {
-        // find variables 
-        let mut chars = text.chars();
+    // find variables 
+    for ch in text.chars() {
 
-        while let Some(ch) = chars.next() {
-
-            match ch {
-
-                // VARS
-                'a'...'z' => vars.add_if_not_exists(ch),
-                // SKIP
-                _ => (),
-                
-            }
-
+        if let 'a'...'z' = ch {
+            vars.add_if_not_exists(ch);       
         }
-    };
+
+    }
+
     {   
         let mut all_possibilities:Vec<Vec<&str>> = Vec::new();
         {   // Given the input variables, generate all possibilities 
