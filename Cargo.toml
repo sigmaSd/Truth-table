@@ -1,0 +1,13 @@
+[package]
+name = "truth-table"
+version = "0.1.0"
+authors = ["Nbiba Bedis <bedisnbiba@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+permutator = "0.3.2"
+eval = "0.4.3"
+
+[dependencies.gtk]
+version = "0.5"
+features = ["v3_22"]
