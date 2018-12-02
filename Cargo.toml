@@ -10,4 +10,4 @@ eval = "0.4.3"
 
 [dependencies.gtk]
 version = "0.5"
-features = ["v3_22"]
+features = ["v3_16"]
