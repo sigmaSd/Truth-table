@@ -1,20 +1,17 @@
 language: rust
 sudo: true
 rust:
-  - beta
+- beta
 os:
-  - "linux"
-dist: "xenial"
-
+- linux
+dist: xenial
 script:
-  - sudo apt-get install libgtk-3-dev
-  - cargo build --release 
-
+- sudo apt-get install libgtk-3-dev
+- cargo build --release
 deploy:
   provider: releases
   api_key:
-    secure: cRyXryp1lwumNwc/SELxWoECgfDC8flc0gyg9xEDE6J3oT2CFZ8gDj7fkINfSm97NONVsBs2dg9UGUsufUQwTMbWddhquCbmYNVwC4/n3P40u1PyEu5Lb3k01bVI+Fr6KRoDkbaxVNY1D7zHpViQjqSN2/hOpkdkgDtOrGYhYtbqJu7ZjE6hSKTpW8yetFyfk0/7PHyjnyRXDZmllVA4Z5/S+IdJzSAdSWk0aGg7K7frfPQRyLoYPpYp5hqtpFme3e7EoJVZUZ4GbaHlOcAFAV+Rud5Le6ofU04TMZI4U5ifvqjPSfL7sAgCrPC6wjQVYi4BOzoeiwRms16YMtI+uaxJJ+Gn4NECbOhk1jqcSGNEuzqeGChsL3ODzBmMU4ZuBnef9GuvwF4B64DXZsmC8y9NzyHRJG/mkS5pFJ0hCvdseUOpqkkfTR2JvSHtshpGpG9YKowSH0dbh49+/1ZY556d9/ykmFV0kVgFgCWDTGCfIvTJWbazZ9LeUPJOzmCo7F6Qu0zvEzy4IWc99UTMxNTLOD5JxwT1zlzRn2T6cdiog2fOoqnRDyv3KxgX7Ng3MpOQG+yLGhvHh4YUes+zSfw00ga7K+vS3ejwLneQyEDQwO2KyxJeLerPBEOFeNiejzZHsMbVMF5yeyKZPDvrY+eTHbc1l2inkgwAW5kJ8qY=
-  file: target/release/bool-table 
-  skip_cleanup: true
+    secure: lXF/2UPYOcsYQxuBCN5GzF1JylGtS8wCCbEppVwrSq+eQWVs1xFY+NDD4o/pjk7SkGXu8Aj7FZCBfANL8KJRM7moqdbR4+z7v7IcpngLgeT+bEaZS+f67prqKQg2kXlNVSpYzKHH7aceZVcJBWLJTOu8NQ8bQo4EX/TLfspqgQX3JzMBzqUP5MaoV5sdlotaOo3hRJxmbWmy8m+FkeV7r8K/mqXoXpGPlU8uRKkzZ+QdLM1VIdFi2eUFpdX43KWDKst6i5ppGHu/C/qKsl6enaTIcrIb90UjuG9KOMhFsaxhdvDvHTq582GcKMOyK9jXBwgkGHp0/wzSWgrmjARyn422vC1YuUBpQLv2Iv8LQ8JwT2eeGNMwVu5+eAav2qTeBH4OSMVTb6ANtzoo2QEeShqX2UjcZNPh6VMvKD+CapL3oqOfQBlV95AgNvgKuu9klsTQoQ4JFSnXHpnzn+OiGzb/QuGs5srhNRM1RWTxR8foDJPqYLHe0AlUYPenE2VV/OSyouUfyqY1U0x+zirezYqz/AesFdpajZCSuu5dUMCzf5w48c8BuVJlPw515ATgfeGKaTAO3OYTxoSOb0a4DR+0Mp2ss2w0WkJcFSeb2AL246stE/C6cSWH/stSJ6OHZH8WjlyPJbnAgtRKTEoH1vCth/TYn3tt7FWGQKDS22Y=
+  file: target/release/bool-table
   on:
     repo: sigmaSd/Truth-table
