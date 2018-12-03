@@ -166,9 +166,10 @@ fn parse(text: &str) -> (Vec<char>, Vec<(Vec<&'static str>, Value)>) {
     }
 
     {
-        let mut all_possibilities: Vec<Vec<&str>> = Vec::new();
-        {
+        if !vars.is_empty() {
             // Given the input variables, generate all possibilities
+            let mut all_possibilities: Vec<Vec<&str>> = Vec::new();
+
             let vars_bin: Vec<Vec<&str>> = vars.iter().map(|_| vec!["true", "false"]).collect();
 
             let vars_bin: Vec<&[&str]> = vars_bin.iter().map(|x| x.as_slice()).collect();
@@ -176,57 +177,57 @@ fn parse(text: &str) -> (Vec<char>, Vec<(Vec<&'static str>, Value)>) {
                 let p: Vec<&str> = p.iter().map(|x| **x).collect();
                 all_possibilities.push(p);
             });
-        }
 
-        for poss in all_possibilities {
-            let mut formula = text.to_string();
-            let mut counter = 0;
-            while counter < vars.len() {
-                formula = formula.replace(vars[counter], &poss[counter].to_string());
-                counter += 1;
-            }
-
-            formula = {
-                // magic ahead be careful
-                // handle ! bool manually for now to avoid bug
-
-                let text = formula.replace("!false", "true").replace("!true", "false");
-                let mut text: Vec<char> = text.chars().collect();
-                let mut idx = 0;
-                let mut balancer = 0;
-                while idx < text.len() {
-                    if text[idx] == '!'
-                        && text[idx + 1] == '('
-                        && (idx != 0 && text[idx - 1] != '(')
-                    {
-                        balancer += 1;
-                        let mut inner_idx = idx + 2;
-                        while balancer != 0 {
-                            if text[inner_idx] == '(' {
-                                balancer += 1;
-                            };
-                            if text[inner_idx] == ')' {
-                                balancer -= 1;
-                            };
-                            inner_idx += 1;
-                        }
-                        text.insert(idx, '(');
-                        text.insert(inner_idx + 1, ')');
-
-                        idx = 0;
-                        balancer = 0;
-                        continue;
-                    }
-                    idx += 1;
+            for poss in all_possibilities {
+                let mut formula = text.to_string();
+                let mut counter = 0;
+                while counter < vars.len() {
+                    formula = formula.replace(vars[counter], &poss[counter].to_string());
+                    counter += 1;
                 }
-                text.into_iter().collect()
-            };
 
-            results.push((poss, eval(&formula).expect("Error while parsing")));
+                formula = handle_bool_manually(&formula);
+                results.push((poss, eval(&formula).expect("Error while parsing")));
+            }
+        } else {
+            let fixed_text = handle_bool_manually(&text);
+            results.push((vec![], (eval(&fixed_text).expect("Error while parsing"))));
         }
-    };
+    }
 
     (vars, results)
+}
+
+fn handle_bool_manually(formula: &str) -> String {
+    // workaround eval limitation
+    let formula = formula.replace("0", "false").replace("1", "true");
+    let text = formula.replace("!false", "true").replace("!true", "false");
+    let mut text: Vec<char> = text.chars().collect();
+    let mut idx = 0;
+    let mut balancer = 0;
+    while idx < text.len() {
+        if text[idx] == '!' && text[idx + 1] == '(' && (idx != 0 && text[idx - 1] != '(') {
+            balancer += 1;
+            let mut inner_idx = idx + 2;
+            while balancer != 0 {
+                if text[inner_idx] == '(' {
+                    balancer += 1;
+                };
+                if text[inner_idx] == ')' {
+                    balancer -= 1;
+                };
+                inner_idx += 1;
+            }
+            text.insert(idx, '(');
+            text.insert(inner_idx + 1, ')');
+
+            idx = 0;
+            balancer = 0;
+            continue;
+        }
+        idx += 1;
+    }
+    text.into_iter().collect()
 }
 
 fn main() {
