@@ -1,9 +1,11 @@
-use eval::{eval, Value};
 use gtk::{
     ContainerExt, Entry, EntryExt, EntryIconPosition, Grid, GridExt, GtkWindowExt, Inhibit, Label,
     LabelExt, WidgetExt, Window, WindowType,
 };
 use permutator::CartesianProduct;
+
+mod eval;
+use crate::eval::eval;
 
 // useful trait
 trait AddIfNotExists<T> {
@@ -106,7 +108,7 @@ impl Pages {
                 Self::fill_grid(&grid, &var_labels, &var_values);
             });
     }
-    fn fill_grid(grid: &Grid, labels: &[char], values: &[(Vec<&'static str>, Value)]) {
+    fn fill_grid(grid: &Grid, labels: &[char], values: &[(Vec<&'static str>, String)]) {
         let last_col = labels.len() as i32;
         for (idx, label) in labels.iter().enumerate() {
             let label_text = label.to_string();
@@ -130,18 +132,20 @@ impl Pages {
                 let col = col as i32;
                 grid.attach(&label_with_markup(input), col, row, 1, 1);
             }
-            let output = match output {
-                Value::Bool(true) => "1",
-                Value::Bool(false) => "0",
+
+            let output = match output.trim() {
+                "true" => "1",
+                "false" => "0",
                 _ => unreachable!(),
             };
+
             grid.attach(&label_with_markup(output), last_col, row, 1, 1);
         }
 
         grid.show_all();
     }
 }
-fn parse(text: &str) -> (Vec<char>, Vec<(Vec<&'static str>, Value)>) {
+fn parse(text: &str) -> (Vec<char>, Vec<(Vec<&'static str>, String)>) {
     let text = {
         // make parsing easier
         let text = text.to_lowercase().replace(" ", "");
@@ -186,48 +190,20 @@ fn parse(text: &str) -> (Vec<char>, Vec<(Vec<&'static str>, Value)>) {
                     counter += 1;
                 }
 
-                formula = handle_bool_manually(&formula);
-                results.push((poss, eval(&formula).expect("Error while parsing")));
+                //formula = handle_bool_manually(&formula);
+                let formula = formula.replace("0", "false").replace("1", "true");
+
+                results.push((poss, eval(&formula)));
             }
         } else {
-            let fixed_text = handle_bool_manually(&text);
-            results.push((vec![], (eval(&fixed_text).expect("Error while parsing"))));
+            //let fixed_text = handle_bool_manually(&text);
+            let fixed_text = text.replace("0", "false").replace("1", "true");
+
+            results.push((vec![], (eval(&fixed_text))));
         }
     }
 
     (vars, results)
-}
-
-fn handle_bool_manually(formula: &str) -> String {
-    // workaround eval limitation
-    let formula = formula.replace("0", "false").replace("1", "true");
-    let text = formula.replace("!false", "true").replace("!true", "false");
-    let mut text: Vec<char> = text.chars().collect();
-    let mut idx = 0;
-    let mut balancer = 0;
-    while idx < text.len() {
-        if text[idx] == '!' && text[idx + 1] == '(' && (idx != 0 && text[idx - 1] != '(') {
-            balancer += 1;
-            let mut inner_idx = idx + 2;
-            while balancer != 0 {
-                if text[inner_idx] == '(' {
-                    balancer += 1;
-                };
-                if text[inner_idx] == ')' {
-                    balancer -= 1;
-                };
-                inner_idx += 1;
-            }
-            text.insert(idx, '(');
-            text.insert(inner_idx + 1, ')');
-
-            idx = 0;
-            balancer = 0;
-            continue;
-        }
-        idx += 1;
-    }
-    text.into_iter().collect()
 }
 
 fn main() {

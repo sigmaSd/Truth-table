@@ -6,7 +6,6 @@ edition = "2018"
 
 [dependencies]
 permutator = "0.3.2"
-eval = "0.4.3"
 
 [dependencies.gtk]
 version = "0.5"
