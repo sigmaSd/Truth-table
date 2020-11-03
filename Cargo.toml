@@ -9,5 +9,5 @@ permutator = "0.3.2"
 eval = "0.4.3"
 
 [dependencies.gtk]
-version = "0.5"
+version = "0.9.2"
 features = ["v3_16"]

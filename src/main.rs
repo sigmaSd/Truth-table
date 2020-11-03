@@ -62,8 +62,8 @@ impl FirstPage {
 
     fn _entry_formula() -> Entry {
         let entry = Entry::new();
-        entry.set_icon_from_icon_name(EntryIconPosition::Secondary, "object-select");
-        entry.set_placeholder_text("Exp: xANDyOR(zANDx)");
+        entry.set_icon_from_icon_name(EntryIconPosition::Secondary, Some("object-select"));
+        entry.set_placeholder_text(Some("Exp: xANDyOR(zANDx)"));
 
         entry
     }
@@ -100,7 +100,7 @@ impl Pages {
             .connect_icon_press(move |entry, _icon_pos, _event_btn| {
                 first_page_win.hide();
                 second_page_win.show_all();
-                let entry_text = entry.get_text().expect("Error while reading entry formula");
+                let entry_text = entry.get_text().to_string();
                 let (var_labels, var_values) = parse(&entry_text);
                 let grid = second_page_grid.clone();
                 Self::fill_grid(&grid, &var_labels, &var_values);
@@ -160,7 +160,7 @@ fn parse(text: &str) -> (Vec<char>, Vec<(Vec<&'static str>, Value)>) {
 
     // find variables
     for ch in text.chars() {
-        if let 'a'...'z' = ch {
+        if let 'a'..='z' = ch {
             vars.add_if_not_exists(ch);
         }
     }
